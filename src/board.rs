@@ -14,10 +14,19 @@ impl Board {
         Board { fields: [Field::Empty; LENGTH] }
     }
 
-    pub fn set(&self, position: usize, field: Field) -> Board {
+    pub fn set(&self, position: usize, field: Field) -> Result<Board, &str> {
+        if position >= LENGTH {
+            return Err("Out of range");
+        }
+
         let mut fields = self.fields.clone();
-        fields[position] = field;
-        Board { fields: fields }
+        match fields[position] {
+            Field::Empty if position < LENGTH => {
+                fields[position] = field;
+                Ok(Board { fields: fields })
+            }
+            _ => Err("Field is already set"),
+        }
     }
 
     pub fn state(&self) -> State {

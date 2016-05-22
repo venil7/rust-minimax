@@ -2,15 +2,39 @@ mod field;
 mod board;
 mod state;
 mod player;
+use std::io;
 
 fn main() {
-    let board1 = board::Board::new();
-    let board2 = board1.set(1, field::Field::Cross);
-    let board3 = board2.set(0, field::Field::Nought);
-    println!("{}", board1);
-    println!("{}", board2);
-    println!("{}", board3);
+    let mut game = board::Board::new();
 
-    let state3 = board3.state();
-    println!("{}", state3.winner);
+    loop {
+        println!("Your move: [0-8]: ");
+        let mut position = String::new();
+        io::stdin()
+            .read_line(&mut position)
+            .expect("failed to read line");
+
+        let position: usize = match position.trim().parse() {
+            Ok(num) => num,
+            Err(_) => continue,
+        };
+
+        game = match game.set(position, field::Field::Cross) {
+            Ok(new_game) => new_game,
+            Err(message) => {
+                println!("Error: {}", message);
+                continue;
+            }
+        };
+
+        println!("{}", game);
+
+        match game.state() {
+            state @ state::State { game_over: true, .. } => {
+                println!("{} wins the game", state.winner);
+                break;
+            }
+            _ => continue,
+        }
+    }
 }
