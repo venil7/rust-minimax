@@ -2,6 +2,7 @@ use std::fmt;
 use field::Field;
 use state::State;
 use player::Player;
+use eval::Eval;
 
 const LENGTH: usize = 9;
 
@@ -69,6 +70,58 @@ impl Board {
         }
 
         state
+    }
+
+    pub fn minimax(board: &Board, field: Field, depth: i64) -> Eval {
+        let state = board.state();
+        return match state {
+            State { game_over: true, winner: Player::CPU, .. } => {
+                Eval {
+                    position: 0,
+                    score: 10 - depth,
+                }
+            }
+            State { game_over: true, winner: Player::Human, .. } => {
+                Eval {
+                    position: 0,
+                    score: depth - 10,
+                }
+            }
+            State { game_over: true, winner: Player::None, .. } => {
+                Eval {
+                    position: 0,
+                    score: 0,
+                }
+            }
+            State { game_over: false, .. } => {
+                let mut evaluated_moves: Vec<Eval> = vec![];
+
+                for possible_move in state.possible_moves.iter() {
+                    let cloned_board = board.set(*possible_move, field).ok().unwrap();
+                    let score = Board::minimax(&cloned_board, field.reverse(), depth + 1).score;
+                    evaluated_moves.push(Eval::new(*possible_move, score));
+                }
+
+                return match field {
+                    Field::Cross => {
+                        let mut cloned_moves = evaluated_moves.clone();
+                        cloned_moves.sort();
+                        *cloned_moves.first().unwrap()
+                    }
+                    Field::Nought => {
+                        let mut cloned_moves = evaluated_moves.clone();
+                        cloned_moves.sort();
+                        *cloned_moves.last().unwrap()
+                    }
+                    _ => panic!("Should set either X or O"),
+                };
+            }
+        };
+    }
+
+    pub fn cpu(&self) -> Board {
+        let eval = Board::minimax(self, Field::Nought, 1);
+        self.set(eval.position, Field::Nought).unwrap()
     }
 }
 

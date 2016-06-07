@@ -7,6 +7,16 @@ pub enum Field {
     Cross = 2,
 }
 
+impl Field {
+    pub fn reverse(&self) -> Field {
+        match self {
+            &Field::Nought => Field::Cross,
+            &Field::Cross => Field::Nought,
+            _ => panic!("Cant reverese empty"),
+        }
+    }
+}
+
 impl fmt::Display for Field {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {

@@ -2,10 +2,12 @@ mod field;
 mod board;
 mod state;
 mod player;
+mod eval;
 use std::io;
 
 fn main() {
     let mut game = board::Board::new();
+    println!("{}", game);
 
     loop {
         println!("Your move: [0-8]: ");
@@ -26,6 +28,8 @@ fn main() {
                 continue;
             }
         };
+
+        game = game.cpu();
 
         println!("{}", game);
 
