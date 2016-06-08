@@ -1,4 +1,5 @@
 use std::cmp::Ordering;
+use std::fmt;
 
 #[derive(Copy,Clone)]
 pub struct Eval {
@@ -34,3 +35,9 @@ impl PartialEq for Eval {
 }
 
 impl Eq for Eval {}
+
+impl fmt::Display for Eval {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "pos: {},score: {}\n", self.position, self.score)
+    }
+}
