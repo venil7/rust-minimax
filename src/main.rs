@@ -12,9 +12,7 @@ fn main() {
     loop {
         println!("Your move: [0-8]: ");
         let mut position = String::new();
-        io::stdin()
-            .read_line(&mut position)
-            .expect("failed to read line");
+        io::stdin().read_line(&mut position).expect("failed to read line");
 
         let position: usize = match position.trim().parse() {
             Ok(num) => num,

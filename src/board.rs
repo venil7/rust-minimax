@@ -79,48 +79,48 @@ impl Board {
     pub fn minimax(board: &Board, field: Field, depth: i64) -> Eval {
         let state = board.state();
         return match state {
-            State { game_over: true, winner: Player::CPU, .. } => {
-                Eval {
-                    position: 0,
-                    score: 10 - depth,
-                }
+                   State { game_over: true, winner: Player::CPU, .. } => {
+                       Eval {
+                           position: 0,
+                           score: 10 - depth,
+                       }
+                   }
+                   State { game_over: true, winner: Player::Human, .. } => {
+                       Eval {
+                           position: 0,
+                           score: depth - 10,
+                       }
+                   }
+                   State { game_over: true, winner: Player::None, .. } => {
+                       Eval {
+                           position: 0,
+                           score: 0,
+                       }
+                   }
+                   State { game_over: false, .. } => {
+            let mut evaluated_moves: Vec<Eval> = vec![];
+            for possible_move in state.possible_moves.iter() {
+                let cloned_board = board.set(*possible_move, field).ok().unwrap();
+                let score = Board::minimax(&cloned_board, field.reverse(), depth + 1).score;
+                evaluated_moves.push(Eval::new(*possible_move, score));
             }
-            State { game_over: true, winner: Player::Human, .. } => {
-                Eval {
-                    position: 0,
-                    score: depth - 10,
-                }
-            }
-            State { game_over: true, winner: Player::None, .. } => {
-                Eval {
-                    position: 0,
-                    score: 0,
-                }
-            }
-            State { game_over: false, .. } => {
-                let mut evaluated_moves: Vec<Eval> = vec![];
-                for possible_move in state.possible_moves.iter() {
-                    let cloned_board = board.set(*possible_move, field).ok().unwrap();
-                    let score = Board::minimax(&cloned_board, field.reverse(), depth + 1).score;
-                    evaluated_moves.push(Eval::new(*possible_move, score));
-                }
 
-                let mut cloned_moves = evaluated_moves.clone();
-                cloned_moves.sort();
+            let mut cloned_moves = evaluated_moves.clone();
+            cloned_moves.sort();
 
-                return match field {
-                    Field::Cross => {
-                        let first = cloned_moves.first();
-                        return *first.unwrap();
-                    }
-                    Field::Nought => {
-                        let last = cloned_moves.last();
-                        return *last.unwrap();
-                    }
-                    _ => panic!("Should set either X or O"),
-                };
-            }
-        };
+            match field {
+                Field::Cross => {
+                    let first = cloned_moves.first();
+                    return *first.unwrap();
+                }
+                Field::Nought => {
+                    let last = cloned_moves.last();
+                    return *last.unwrap();
+                }
+                _ => panic!("Should set either X or O"),
+            };
+        }
+               };
     }
 
     pub fn cpu(&self) -> Board {
