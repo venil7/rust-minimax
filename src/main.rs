@@ -1,5 +1,3 @@
-extern crate tictactoe;
-
 use tictactoe::*;
 use std::io;
 
