@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use std::fmt;
 
-#[derive(Copy,Clone)]
+#[derive(Copy, Clone)]
 pub struct Eval {
     pub position: usize,
     pub score: i64,

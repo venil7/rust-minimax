@@ -1,6 +1,8 @@
 use std::fmt;
+use wasm_bindgen::prelude::*;
 
-#[derive(Copy,Clone)]
+#[wasm_bindgen]
+#[derive(Copy, Clone)]
 pub enum Field {
     Empty = 0,
     Nought = 1,

@@ -1,13 +1,16 @@
-use std::fmt;
-use crate::field::Field;
-use crate::state::State;
-use crate::player::Player;
 use crate::eval::Eval;
+use crate::field::Field;
+use crate::player::Player;
+use crate::state::State;
+use std::fmt;
+use wasm_bindgen::prelude::*;
 
 const LENGTH: usize = 9;
+pub type Fields = [Field; LENGTH];
 
+#[wasm_bindgen]
 pub struct Board {
-    fields: [Field; LENGTH],
+    fields: Fields,
 }
 
 impl Board {
