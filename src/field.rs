@@ -2,7 +2,8 @@ use std::fmt;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-#[derive(Copy, Clone)]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Field {
     Empty = 0,
     Nought = 1,

@@ -3,20 +3,20 @@ use crate::field::Field;
 use crate::player::Player;
 use crate::state::State;
 use std::fmt;
-use wasm_bindgen::prelude::*;
 
 const LENGTH: usize = 9;
 pub type Fields = [Field; LENGTH];
 
-#[wasm_bindgen]
 pub struct Board {
     fields: Fields,
+    pub last_move: u8,
 }
 
 impl Board {
     pub fn new() -> Board {
         Board {
             fields: [Field::Empty; LENGTH],
+            last_move: (0 - 1) as u8,
         }
     }
 
@@ -29,7 +29,10 @@ impl Board {
         match fields[position] {
             Field::Empty if position < LENGTH => {
                 fields[position] = field;
-                Ok(Board { fields: fields })
+                Ok(Board {
+                    fields: fields,
+                    last_move: position as u8,
+                })
             }
             _ => Err("Field is already set"),
         }
@@ -153,6 +156,7 @@ impl Board {
         if state.game_over {
             return Board {
                 fields: self.fields,
+                last_move: self.last_move,
             };
         };
         let eval = Board::minimax(self, Field::Nought, 1);

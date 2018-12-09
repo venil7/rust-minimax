@@ -1,0 +1,18 @@
+.board {
+  display: block;
+  width: 90px;
+  height: 90px;
+  margin: 50px;
+}
+
+.cell {
+  display: inline-block;
+  width: 30px;
+  height: 30px;
+  outline: grey solid 1px;
+  cursor: pointer;
+  line-height: 1rem;
+}
+.cell:hover {
+  background-color: bisque;
+}

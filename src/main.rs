@@ -1,4 +1,4 @@
-use tictactoe::*;
+use darkruby_tictactoe::*;
 use std::io;
 
 fn main() {

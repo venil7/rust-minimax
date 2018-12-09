@@ -2,8 +2,8 @@ use std::fmt;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
-#[derive(Debug)]
-#[allow(dead_code)]
+#[repr(u8)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Player {
     None,
     CPU,
