@@ -1,9 +1,11 @@
+import classnames from 'classnames';
 import { Field, Game, Player } from "darkruby-tictactoe";
 import * as React from 'react';
 import { useEffect, useReducer } from 'react';
 import * as ReactDOM from "react-dom";
 
 const { Cross, Empty, Nought } = Field;
+const { None, CPU, Human } = Player;
 
 const initState = () => ({
   game: null,
@@ -20,24 +22,48 @@ const updateArray = (array, idx, val) => {
 const reducer = (state, action) => {
   switch (action.type) {
     case 'SET_GAME': return { ...state, game: action.game };
-    case 'SET_WINNER': return { ...state, winner: action.winner };
-    case 'SET_MOVE': return { ...state, cells: updateArray(state.cells, action.idx, action.field) };
+    case 'CPU_MOVE': return {
+      ...state,
+      game: action.game,
+      winner: action.winner,
+      cells: updateArray(state.cells, action.idx, Nought)
+    };
+    case 'HUMAN_MOVE': return {
+      ...state,
+      cells: updateArray(state.cells, action.idx, Cross)
+    };
+    default:
+      return { ...state };
   }
 };
 
-const toField = (f) => {
-  switch (f) {
-    case Field.Cross: return "X";
-    case Field.Nought: return "O";
-    case Field.Empty: return "";
+const Winner = ({ winner }) => {
+  switch (winner) {
+    case CPU: return (<h1>
+      <span class="nought">CPU</span> <span class="cross">WINS</span>
+    </h1>);
+    case Human: return (<h1>
+      <span class="nought">HUMAN</span> <span class="cross">WINS</span>
+    </h1>); //unlikely :)
+    default:
+      return null;
   }
 };
 
-const Cell = ({ field, onClick }) => (
-  <div className="cell" onClick={() => onClick()}>
-    {toField(field)}
-  </div>
-);
+const Cell = ({ field, onClick, winner }) => {
+  const c = classnames({
+    'blank': field === Empty,
+    'nought': field === Nought,
+    'cross': field === Cross,
+  });
+  const clickHandler = (field === Empty && winner === None)
+    ? onClick
+    : () => void 0;
+
+  return (
+    <li className={c} onClick={() => clickHandler()} />
+  )
+};
 
 const App = (props) => {
   const [state, dispatch] = useReducer(reducer, initState());
@@ -45,28 +71,35 @@ const App = (props) => {
 
   useEffect(() => {
     if (!game) {
-      const g = Game.new(
-        (idx) => dispatch({ type: 'SET_MOVE', idx, field: Field.Nought }),
-        (winner) => dispatch({ type: 'SET_WINNER', winner })
-      );
+      const g = Game.new();
       dispatch({ type: 'SET_GAME', game: g });
     }
   }, [game]);
 
   const makeMove = (idx) => {
-    dispatch({ type: 'SET_MOVE', idx, field: Field.Cross });
-    setTimeout(() => state.game.make_move(idx, Cross), 100);
+    dispatch({ type: 'HUMAN_MOVE', idx });
+    setTimeout(() => state.game.make_move(idx, Cross, (cpuIdx, winner, game) => {
+      dispatch({
+        type: 'CPU_MOVE',
+        idx: cpuIdx,
+        game, winner
+      });
+    }), 100);
   }
   return (
-    <div className="board">
-      {state.cells.map((cell, idx) => (
-        <Cell
-          key={idx}
-          field={cell}
-          onClick={() => makeMove(idx)}
-        />
-      ))}
-    </div>
+    <>
+      <ul className="game">
+        {state.cells.map((cell, idx) => (
+          <Cell
+            key={idx}
+            winner={winner}
+            field={cell}
+            onClick={() => makeMove(idx)}
+          />
+        ))}
+      </ul>
+      <Winner winner={winner} />
+    </>
   );
 };
 
