@@ -2,6 +2,7 @@ use crate::eval::Eval;
 use crate::field::Field;
 use crate::player::Player;
 use crate::state::State;
+use rayon::prelude::*;
 use std::fmt;
 
 const LENGTH: usize = 9;
@@ -57,7 +58,7 @@ impl Board {
             [2, 4, 6],
         ];
 
-        for comb in combinations.into_iter() {
+        for comb in combinations.iter() {
             match (
                 self.fields[comb[0]],
                 self.fields[comb[1]],
@@ -126,12 +127,15 @@ impl Board {
             State {
                 game_over: false, ..
             } => {
-                let mut evaluated_moves: Vec<Eval> = vec![];
-                for possible_move in state.possible_moves.iter() {
-                    let cloned_board = board.set(*possible_move, field).ok().unwrap();
-                    let score = Board::minimax(&cloned_board, field.reverse(), depth + 1).score;
-                    evaluated_moves.push(Eval::new(*possible_move, score));
-                }
+                let evaluated_moves: Vec<Eval> = state
+                    .possible_moves
+                    .par_iter()
+                    .map(|possible_move| {
+                        let cloned_board = board.set(*possible_move, field).ok().unwrap();
+                        let score = Board::minimax(&cloned_board, field.reverse(), depth + 1).score;
+                        Eval::new(*possible_move, score)
+                    })
+                    .collect();
 
                 let mut cloned_moves = evaluated_moves.clone();
                 cloned_moves.sort();
