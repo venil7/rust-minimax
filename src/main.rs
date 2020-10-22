@@ -1,3 +1,4 @@
+use darkruby_tictactoe::state::State;
 use darkruby_tictactoe::*;
 use std::io;
 
@@ -29,14 +30,9 @@ fn main() {
 
     println!("{}", game);
 
-    match game.state() {
-      state @ state::State {
-        game_over: true, ..
-      } => {
-        println!("{} wins the game", state.winner);
-        break;
-      }
-      _ => continue,
+    if let State::GameOver(winner) = game.state() {
+      println!("{} wins the game", winner);
+      break;
     }
   }
 }

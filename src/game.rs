@@ -23,11 +23,11 @@ impl Game {
       Ok(board) => {
         let board = board.cpu();
         let game = Game { board };
-        let state = game.board.state();
+        let _state = game.board.state();
         let this = JsValue::NULL;
 
-        let winner = JsValue::from(state.winner as u8);
-        let last_index = JsValue::from(game.board.last_move);
+        let winner = JsValue::from(/*state.winner*/ 0 as u8);
+        let last_index = JsValue::from(0 as u8 /*game.board.last_move*/);
         let game = JsValue::from(game);
 
         let _ = callback.call3(&this, &last_index, &winner, &game);
