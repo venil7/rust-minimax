@@ -1,5 +1,6 @@
 use crate::board::*;
 use crate::field::*;
+use std::error::Error;
 
 use js_sys;
 use wasm_bindgen::prelude::*;
@@ -17,11 +18,16 @@ impl Game {
     }
   }
 
-  pub fn make_move(&self, position: usize, field: Field, callback: js_sys::Function) {
+  pub fn make_move(
+    &self,
+    position: usize,
+    field: Field,
+    callback: js_sys::Function,
+  ) -> Result<(), Box<dyn Error>> {
     let result = self.board.set(position, field);
     match result {
       Ok(board) => {
-        let board = board.cpu();
+        let board = board.cpu()?;
         let game = Game { board };
         let _state = game.board.state();
         let this = JsValue::NULL;
@@ -34,5 +40,6 @@ impl Game {
       }
       _ => (),
     }
+    Ok(())
   }
 }

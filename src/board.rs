@@ -1,3 +1,4 @@
+use crate::error::GameError;
 use crate::eval::Eval;
 use crate::field::Field;
 use crate::player::Player;
@@ -18,19 +19,24 @@ impl Board {
             fields: [Field::Empty; LENGTH],
         }
     }
+    pub fn from_fields(fields: &Fields) -> Board {
+        Board {
+            fields: fields.clone(),
+        }
+    }
 
-    pub fn set(&self, position: usize, field: Field) -> Result<Board, &str> {
+    pub fn set(&self, position: usize, field: Field) -> Result<Board, GameError> {
         if position >= LENGTH {
-            return Err("Out of range");
+            return Err(GameError::new("Out of range".into()));
         }
 
         let mut fields = self.fields.clone();
         match fields[position] {
             Field::Empty if position < LENGTH => {
                 fields[position] = field;
-                Ok(Board { fields: fields })
+                Ok(Board::from_fields(&fields))
             }
-            _ => Err("Field is already set"),
+            _ => Err(GameError::new("Field is already set".into())),
         }
     }
 
@@ -81,58 +87,62 @@ impl Board {
         State::GameContinues { possible_moves }
     }
 
-    pub fn minimax(board: &Board, field: Field, depth: i64) -> Eval {
+    pub fn minimax(board: &Board, field: Field, depth: i64) -> Result<Eval, GameError> {
         let state = board.state();
         return match state {
-            State::GameOver(Player::CPU) => Eval {
+            State::GameOver(Player::CPU) => Ok(Eval {
                 position: 0,
                 score: 10 - depth,
-            },
-            State::GameOver(Player::Human) => Eval {
+            }),
+            State::GameOver(Player::Human) => Ok(Eval {
                 position: 0,
                 score: depth - 10,
-            },
-            State::GameOver(Player::None) => Eval {
+            }),
+            State::GameOver(Player::None) => Ok(Eval {
                 position: 0,
                 score: 0,
-            },
+            }),
             State::GameContinues { possible_moves } => {
                 let evaluated_moves: Vec<Eval> = possible_moves
                     .par_iter()
                     .map(|possible_move| {
-                        let cloned_board = board.set(*possible_move, field).ok().unwrap();
-                        let score = Board::minimax(&cloned_board, field.reverse(), depth + 1).score;
-                        Eval::new(*possible_move, score)
+                        let cloned_board = board.set(*possible_move, field)?;
+                        let score =
+                            Board::minimax(&cloned_board, field.reverse(), depth + 1)?.score;
+                        Ok(Eval::new(*possible_move, score)) as Result<Eval, GameError>
                     })
-                    .collect();
+                    .filter(|e| e.is_ok())
+                    .map(|e| e.unwrap() as Eval)
+                    .collect::<Vec<Eval>>();
 
                 let mut cloned_moves = evaluated_moves.clone();
                 cloned_moves.sort();
 
                 match field {
                     Field::Cross => {
-                        let first = cloned_moves.first();
-                        return *first.unwrap();
+                        let first = cloned_moves
+                            .first()
+                            .ok_or(GameError::new("No best move fox X".into()))?;
+                        return Ok(*first);
                     }
                     Field::Nought => {
-                        let last = cloned_moves.last();
-                        return *last.unwrap();
+                        let last = cloned_moves
+                            .last()
+                            .ok_or(GameError::new("No best move for O".into()))?;
+                        return Ok(*last);
                     }
-                    _ => panic!("Should set either X or O"),
+                    _ => return Err(GameError::new("Should set either X or O".into())),
                 };
             }
         };
     }
 
-    pub fn cpu(&self) -> Board {
+    pub fn cpu(&self) -> Result<Board, GameError> {
         match self.state() {
-            State::GameOver(_) => Board {
-                fields: self.fields,
-            },
+            State::GameOver(_) => Ok(Board::from_fields(&self.fields)),
             _ => {
-                let eval = Board::minimax(self, Field::Nought, 1);
-                let board = self.set(eval.position, Field::Nought);
-                board.unwrap()
+                let eval = Board::minimax(self, Field::Nought, 1)?;
+                self.set(eval.position, Field::Nought)
             }
         }
     }

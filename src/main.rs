@@ -1,24 +1,24 @@
+use darkruby_tictactoe::board::Board;
+use darkruby_tictactoe::field::Field;
 use darkruby_tictactoe::state::State;
-use darkruby_tictactoe::*;
+use std::error::Error;
 use std::io;
 
-fn main() {
-  let mut game = board::Board::new();
-  println!("{}", game);
+fn main() -> Result<(), Box<dyn Error>> {
+  let mut board = Board::new();
+  println!("{}", board);
 
   loop {
     println!("Your move: [0-8]: ");
     let mut position = String::new();
-    io::stdin()
-      .read_line(&mut position)
-      .expect("failed to read line");
+    io::stdin().read_line(&mut position)?;
 
     let position: usize = match position.trim().parse() {
       Ok(num) => num,
       Err(_) => continue,
     };
 
-    game = match game.set(position, field::Field::Cross) {
+    board = match board.set(position, Field::Cross) {
       Ok(new_game) => new_game,
       Err(message) => {
         println!("Error: {}", message);
@@ -26,13 +26,15 @@ fn main() {
       }
     };
 
-    game = game.cpu();
+    board = board.cpu()?;
 
-    println!("{}", game);
+    println!("{}", board);
 
-    if let State::GameOver(winner) = game.state() {
+    if let State::GameOver(winner) = board.state() {
       println!("{} wins the game", winner);
       break;
     }
   }
+
+  Ok(())
 }

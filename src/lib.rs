@@ -1,6 +1,7 @@
-pub mod field;
 pub mod board;
-pub mod state;
-pub mod player;
+pub mod error;
 pub mod eval;
+pub mod field;
 pub mod game;
+pub mod player;
+pub mod state;
