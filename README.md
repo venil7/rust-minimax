@@ -2,13 +2,13 @@
 
 ## WebAssembly Example
 
- - `Rust` tic-tac-toe (Noughts & Crosses) engine, compiled to `WebAssembly`
- - `React` UI
+- `Rust` tic-tac-toe (Noughts & Crosses) engine, compiled to `WebAssembly`
+- `React` UI
 
- ## Gameplay
+## Gameplay
 
- ![gameplay](./gameplay.gif)
+![gameplay](./gameplay.gif)
 
- CSS [found here](https://codepen.io/coreydunkin/pen/zqrud) and is `(c)` by original author
+CSS [found here](https://codepen.io/coreydunkin/pen/zqrud) and is `(c)` by original author
 
- Code `(c)` 2018 Art Deineka, [darkest_ruby](https://twitter.com/darkest_ruby)
+Code `(c)` 2018-2020 Art Deineka, [darkest_ruby](https://twitter.com/darkest_ruby)

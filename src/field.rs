@@ -1,3 +1,5 @@
+use crate::error::GameError;
+use std::convert::TryFrom;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
@@ -29,3 +31,26 @@ impl fmt::Display for Field {
         }
     }
 }
+
+impl From<u8> for Field {
+    fn from(v: u8) -> Field {
+        match v {
+            x if x == Field::Nought as u8 => Field::Nought,
+            x if x == Field::Cross as u8 => Field::Cross,
+            _ => Field::Empty,
+        }
+    }
+}
+
+// impl TryFrom<u8> for Field {
+//     type Error = GameError;
+
+//     fn try_from(v: u8) -> Result<Self, Self::Error> {
+//         match v {
+//             x if x == Field::Empty as u8 => Ok(Field::Empty),
+//             x if x == Field::Nought as u8 => Ok(Field::Nought),
+//             x if x == Field::Cross as u8 => Ok(Field::Cross),
+//             _ => Err(GameError::new("cannot unpack field byte".into())),
+//         }
+//     }
+// }
