@@ -19,9 +19,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     };
 
     board = match board.set(position, Field::Cross) {
-      Ok(new_game) => new_game,
-      Err(message) => {
-        println!("Error: {}", message);
+      Ok(new_board) => new_board,
+      Err(game_error) => {
+        println!("Error: {}", game_error);
         continue;
       }
     };

@@ -4,11 +4,14 @@ use crate::field::Field;
 use crate::player::Player;
 use crate::state::State;
 use rayon::prelude::*;
+use std::convert::TryInto;
+use std::error::Error;
 use std::fmt;
 
 const LENGTH: usize = 9;
 pub type Fields = [Field; LENGTH];
 
+#[derive(Clone)]
 pub struct Board {
     fields: Fields,
 }
@@ -19,9 +22,23 @@ impl Board {
             fields: [Field::Empty; LENGTH],
         }
     }
+
     pub fn from_fields(fields: &Fields) -> Board {
         Board {
             fields: fields.clone(),
+        }
+    }
+
+    pub fn to_vec(&self) -> Vec<Field> {
+        self.fields.to_vec()
+    }
+    pub fn from_vec(fields: &Vec<Field>) -> Result<Board, Box<dyn Error>> {
+        match fields.len() {
+            9 => {
+                let fields: Fields = fields[..].try_into()?;
+                Ok(Board { fields })
+            }
+            _ => Err(Box::new(GameError::new("not long enought vec".into()))),
         }
     }
 

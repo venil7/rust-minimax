@@ -1,5 +1,3 @@
-use crate::error::GameError;
-use core::convert::TryFrom;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
@@ -31,16 +29,3 @@ impl From<u8> for Player {
         }
     }
 }
-
-// impl TryFrom<u8> for Player {
-//     type Error = GameError;
-
-//     fn try_from(v: u8) -> Result<Self, Self::Error> {
-//         match v {
-//             x if x == Player::None as u8 => Ok(Player::None),
-//             x if x == Player::CPU as u8 => Ok(Player::CPU),
-//             x if x == Player::Human as u8 => Ok(Player::Human),
-//             _ => Err(GameError::new("cannot unpack player byte".into())),
-//         }
-//     }
-// }
