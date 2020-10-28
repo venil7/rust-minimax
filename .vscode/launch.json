@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "cli",
+      "program": "${workspaceRoot}/target/debug/cli",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "server",
+      "program": "${workspaceRoot}/target/debug/server",
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
+}

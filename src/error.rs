@@ -31,4 +31,10 @@ impl From<std::io::Error> for GameError {
   }
 }
 
+impl From<std::array::TryFromSliceError> for GameError {
+  fn from(e: std::array::TryFromSliceError) -> GameError {
+    GameError::new(format!("{}", e))
+  }
+}
+
 impl Error for GameError {}

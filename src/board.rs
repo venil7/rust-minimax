@@ -5,7 +5,6 @@ use crate::player::Player;
 use crate::state::State;
 use rayon::prelude::*;
 use std::convert::TryInto;
-use std::error::Error;
 use std::fmt;
 
 const LENGTH: usize = 9;
@@ -32,13 +31,14 @@ impl Board {
     pub fn to_vec(&self) -> Vec<Field> {
         self.fields.to_vec()
     }
-    pub fn from_vec(fields: &Vec<Field>) -> Result<Board, Box<dyn Error>> {
+
+    pub fn from_vec(fields: &Vec<Field>) -> Result<Board, GameError> {
         match fields.len() {
             9 => {
                 let fields: Fields = fields[..].try_into()?;
                 Ok(Board { fields })
             }
-            _ => Err(Box::new(GameError::new("not long enought vec".into()))),
+            _ => Err(GameError::new("not long enought vec".into())),
         }
     }
 

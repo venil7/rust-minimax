@@ -1,23 +1,23 @@
 use crate::board::Board;
 use crate::field::Field;
+use crate::network::connection::Connection;
+use crate::network::protocol::Frame;
 use crate::player::Player;
-use crate::server::connection::Connection;
-use crate::server::protocol::Frame;
 use crate::state::State;
 use std::collections::HashMap;
 use std::error::Error;
-use tokio::sync::mpsc; //::{Receiver, Sender};
-use tokio::sync::oneshot; //::{Receiever, Sender};
+use tokio::sync::mpsc;
+use tokio::sync::oneshot;
 
 pub type Message = (String, Frame, oneshot::Sender<Frame>);
 
-pub struct GameServer {
+pub struct Server {
   games: HashMap<String, Board>,
 }
 
-impl GameServer {
-  pub fn new() -> GameServer {
-    GameServer {
+impl Server {
+  pub fn new() -> Server {
+    Server {
       games: HashMap::new(),
     }
   }
@@ -36,6 +36,10 @@ impl GameServer {
         }
         // User requested a move
         Frame::RequestMove(position) => {
+          // if !self.games.contains_key(&client_id) {
+          //   let board = Board::new();
+          //   self.games.insert(client_id.clone(), board.clone());
+          // }
           let board = self.games[&client_id].clone();
           match board
             .set(position as usize, Field::Cross)
@@ -44,8 +48,9 @@ impl GameServer {
             Ok(cpu_board) => {
               let state = cpu_board.state();
               self.games.insert(client_id, cpu_board.clone());
+              // println!("{}", board);
               Frame::ResponseGameState {
-                fields: board.to_vec(),
+                fields: cpu_board.to_vec(),
                 winner: (match state {
                   State::GameOver(winner) => winner,
                   _ => Player::None,
