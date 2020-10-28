@@ -44,8 +44,7 @@ async fn main() -> Result<(), Box<dyn Error>> {
     if let State::GameOver(winner) = client.board().state() {
       println!("{} wins the game", winner);
       client.new_game().await?;
+      println!("{}", client.board());
     }
   }
-
-  Ok(())
 }

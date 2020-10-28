@@ -66,6 +66,8 @@ impl Frame {
 
 mod test {
   use super::*;
+  // use crate::field::Field;
+  // use crate::player::Player;
 
   #[test]
   fn test_serialize_parse_new_game() {
